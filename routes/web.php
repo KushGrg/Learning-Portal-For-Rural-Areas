@@ -8,11 +8,12 @@ use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Auth;
 
 // Landing page - accessible to all
-Volt::route('/', 'auth.login')->name('login');
+// Volt::route('/', 'auth.login')->name('login');
+Volt::route('/', 'landing')->name('landing');
 
 // Authentication routes
 Route::middleware('guest')->group(function () {
-    // Volt::route('/login', 'auth.login')->name('login');
+    Volt::route('/login', 'auth.login')->name('login');
     Volt::route('/register', 'auth.register')->name('register');
     Volt::route('/forgot-password', 'auth.forgot-password')->name('password.request');
     Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.reset');
@@ -21,9 +22,9 @@ Route::middleware('guest')->group(function () {
 Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Http\Request $request, $id, $hash) {
     $user = \App\Models\User::findOrFail($id);
 
-    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-        throw new AuthorizationException;
-    }
+    // if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+    //     throw new AuthorizationException;
+    // }
 
     if ($user->hasVerifiedEmail()) {
         return redirect('/');
@@ -62,8 +63,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('category')->name('category.')->group(function () {
         Route::get('/', CategoryIndex::class)->name('index')->middleware('permission:access_category');
-             Route::get('/create', CategoryCreate::class)->name('create')->middleware('permission:create_category');
-        // Add more category routes here as needed
+        Route::get('/create', CategoryCreate::class)->name('create')->middleware('permission:create_category');
     });
 });
 

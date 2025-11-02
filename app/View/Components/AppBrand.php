@@ -9,7 +9,7 @@ use Illuminate\View\Component;
 class AppBrand extends Component
 {
     public array $images = [
-       
+
     ];
     /**
      * Create a new component instance.
@@ -25,24 +25,25 @@ class AppBrand extends Component
     public function render(): View|Closure|string
     {
         return <<<'HTML'
-                <a href="/dashboard" wire:navigate>
-                    <!-- Hidden when collapsed -->
-                    <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
-                        <div class="flex justify-center items-center ">
-                            <img src="/images/nccslogo.png" alt="NCCS Logo" class="h-12 w-auto" />
-                            <!-- <span class="font-bold text-3xl me-3 text-purple-500 pink-300 bg-clip-text"> -->
-                            <!-- </span> -->
-                        </div>
-                    </div>
+        <a href="/dashboard" wire:navigate>
+            <!-- Visible when expanded -->
+            <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
+                <div class="flex justify-center items-center space-x-3">
+                    <img src="/images/L.png" alt="NCCS Logo" class="h-16 w-auto " />
+                    <span class="font-bold text-2xl bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent">
+                         Learning Portal
+                    </span>
+                </div>
+            </div>
 
-                    <!-- Display when collapsed -->
-                    <div class="display-when-collapsed hidden mx-5 mt-5 mb-1 h-[28px]">
-                        <x-icon name="s-cube" class="w-6 -mb-1.5 text-purple-500" />
-                    </div>
-                </a>
-            HTML;
+            <!-- Shown when collapsed -->
+            <div class="display-when-collapsed hidden mx-auto mt-4 mb-2">
+                <x-icon name="s-cube" class="w-8 h-8 text-purple-500" />
+            </div>
+        </a>
+    HTML;
     }
 }
 
-    
+
 

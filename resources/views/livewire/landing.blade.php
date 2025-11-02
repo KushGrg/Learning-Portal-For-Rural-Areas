@@ -4,10 +4,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Volt\Component;
 
-new
-#[Layout('components.layouts.empty')]
-#[Title('Welcome')]
-class extends Component {
+new #[Layout('components.layouts.empty')] #[Title('Welcome')] class extends Component {
     public function mount()
     {
         // No additional logic needed for now
@@ -31,7 +28,7 @@ class extends Component {
             <x-button label="Logout" link="/logout" icon="o-arrow-right-on-rectangle" class="btn-ghost" />
         @else
             <x-button label="Login" link="/login" icon="o-arrow-right-on-rectangle" class="btn-primary" />
-            {{-- <x-button label="Register" link="/register" icon="o-user-plus" class="btn-ghost" /> --}}
+            <x-button label="Register" link="/register" icon="o-user-plus" class="btn-primary" />
         @endauth
     </div>
-</div> 
+</div>

@@ -2,8 +2,12 @@
     <x-slot:sidebar drawer="main-drawer" collapsible class="bg-white">
 
         {{-- BRAND --}}
-        <x-app-brand class="px-5 pt-4" />
-
+        {{-- <x-app-brand class="px-5 pt-4" /> --}}
+        {{-- <img src="/images/L.png" alt="NCCS Logo" class="h-20 w-auto px-5 pt-4" /> --}}
+        {{-- <div {{ $attributes->class(["hidden-when-collapsed"]) }}> --}}
+        <div class="flex justify-center items-center space-x-3">
+            <img src="/images/L.png" alt="NCCS Logo" class="h-16 w-25 " />
+        </div>
         <x-menu-separator />
 
         {{-- MENU --}}

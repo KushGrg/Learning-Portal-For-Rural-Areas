@@ -12,8 +12,8 @@ class DefaultUsersSeeder extends Seeder
     {
         // Create admin user
         $superAdmin = User::create([
-            'name' => 'NCCS',
-            'email' => 'nccsedu@nccs.edu.np',
+            'name' => 'KUSH',
+            'email' => 'superadmin@gmail.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
             'previously_verified' => true,
@@ -30,4 +30,4 @@ class DefaultUsersSeeder extends Seeder
         ]);
         $admin->assignRole('admin');
     }
-} 
+}
