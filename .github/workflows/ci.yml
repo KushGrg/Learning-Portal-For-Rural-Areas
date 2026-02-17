@@ -1,0 +1,140 @@
+name: Pint and Phpstan
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+jobs:
+  phpstan:
+    name: Static Analysis
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: json, dom, curl, libxml, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-scripts --no-progress
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      
+      - name: Generate key
+        run: php artisan key:generate
+
+      - name: Restore result cache
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp
+          key: "phpstan-result-cache-${{ github.run_id }}"
+          restore-keys: |
+            phpstan-result-cache-
+
+      - name: Run phpstan
+        run: php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
+
+      - name: Save result cache
+        uses: actions/cache/save@v4
+        if: ${{ !cancelled() }}
+        with:
+          path: tmp
+          key: "phpstan-result-cache-${{ github.run_id }}"
+
+  pint:
+    name: Code Style
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: json, dom, curl, libxml, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-scripts --no-progress
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          CODE_STYLE_CHANGED=false
+          COMPOSER_LOCK_CHANGED=false
+          git diff --quiet || CODE_STYLE_CHANGED=true
+          git diff --quiet composer.lock || COMPOSER_LOCK_CHANGED=true
+
+          if [[ "$CODE_STYLE_CHANGED" == "true" && "$COMPOSER_LOCK_CHANGED" == "true" ]]; then
+            COMMIT_MESSAGE="Apply code style fixes and update composer.lock"
+          elif [[ "$CODE_STYLE_CHANGED" == "true" ]]; then
+            COMMIT_MESSAGE="Apply code style fixes"
+          elif [[ "$COMPOSER_LOCK_CHANGED" == "true" ]]; then
+            COMMIT_MESSAGE="Update composer.lock"
+          else
+            COMMIT_MESSAGE=""
+          fi
+
+          echo "code_style_changed=$CODE_STYLE_CHANGED" >> $GITHUB_OUTPUT
+          echo "composer_lock_changed=$COMPOSER_LOCK_CHANGED" >> $GITHUB_OUTPUT
+          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+
+      - name: Run Pint
+        run: php -d memory_limit=-1 vendor/bin/pint
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: ${{ steps.check_changes.outputs.commit_message }}
+          commit_user_name: "GitHub Action"
+          commit_user_email: "action@github.com"
+        if: ${{ steps.check_changes.outputs.code_style_changed == 'true' || steps.check_changes.outputs.composer_lock_changed == 'true' }}
