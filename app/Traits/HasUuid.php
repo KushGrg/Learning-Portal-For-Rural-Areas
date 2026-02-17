@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Traits;
+
 use Illuminate\Support\Str;
 
 trait HasUuid
 {
     //
-     protected static function bootHasUuid()
+    protected static function bootHasUuid()
     {
         static::creating(function ($model) {
             if (empty($model->uuid)) {
@@ -20,7 +21,7 @@ trait HasUuid
      */
     public function initializeHasUuid()
     {
-        if (!in_array('uuid', $this->fillable)) {
+        if (! in_array('uuid', $this->fillable)) {
             $this->fillable[] = 'uuid';
         }
     }

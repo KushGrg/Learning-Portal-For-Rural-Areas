@@ -3,6 +3,7 @@
 namespace App\Livewire\Themes;
 
 use PowerComponents\LivewirePowerGrid\Themes\Theme;
+
 class MaryUI extends Theme
 {
     public string $name = 'daisyui';
@@ -11,30 +12,30 @@ class MaryUI extends Theme
     {
         return [
             'layout' => [
-                'base'      => 'p-3 align-middle inline-block min-w-full w-full sm:px-6 lg:px-4',
-                'div'       => 'rounded-t-lg relative border-x border-t border-base-300',
-                'table'     => 'table table-zebra',
+                'base' => 'p-3 align-middle inline-block min-w-full w-full sm:px-6 lg:px-4',
+                'div' => 'rounded-t-lg relative border-x border-t border-base-300',
+                'table' => 'table table-zebra',
                 'container' => '-my-2 overflow-x-auto sm:-mx-3 lg:-mx-6',
-                'actions'   => 'gap-2',
+                'actions' => 'gap-2',
             ],
 
             'header' => [
-                'thead'    => 'text-base-content !capitalize',
-                'tr'       => 'bg-base-200',
-                'th'       => '',
+                'thead' => 'text-base-content !capitalize',
+                'tr' => 'bg-base-200',
+                'th' => '',
                 'thAction' => '',
             ],
 
             'body' => [
-                'tbody'              => '',
-                'tbodyEmpty'         => '',
-                'tr'                 => '',
-                'td'                 => '',
-                'tdEmpty'            => '',
-                'tdSummarize'        => '',
-                'trSummarize'        => '',
-                'tdFilters'          => '',
-                'trFilters'          => '',
+                'tbody' => '',
+                'tbodyEmpty' => '',
+                'tr' => '',
+                'td' => '',
+                'tdEmpty' => '',
+                'tdSummarize' => '',
+                'trSummarize' => '',
+                'tdFilters' => '',
+                'trFilters' => '',
                 'tdActionsContainer' => 'flex gap-2',
             ],
         ];
@@ -43,19 +44,19 @@ class MaryUI extends Theme
     public function layout(): array
     {
         return [
-            'table'      => $this->root() . '.table-base',
-            'header'     => $this->root() . '.header',
-            'pagination' => $this->root() . '.pagination',
-            'footer'     => $this->root() . '.footer',
+            'table' => $this->root().'.table-base',
+            'header' => $this->root().'.header',
+            'pagination' => $this->root().'.pagination',
+            'footer' => $this->root().'.footer',
         ];
     }
 
     public function footer(): array
     {
         return [
-            'view'                   => $this->root() . '.footer',
-            'select'                 => 'select flex rounded-md py-1.5 px-4 pr-7 w-auto',
-            'footer'                 => 'border-x border-b rounded-b-lg border-b !border-base-200 !text-base-content',
+            'view' => $this->root().'.footer',
+            'select' => 'select flex rounded-md py-1.5 px-4 pr-7 w-auto',
+            'footer' => 'border-x border-b rounded-b-lg border-b !border-base-200 !text-base-content',
             'footer_with_pagination' => 'md:flex md:flex-row w-full items-center py-3 overflow-y-auto pl-2 pr-2 relative !text-base-content',
         ];
     }
@@ -70,24 +71,23 @@ class MaryUI extends Theme
     public function editable(): array
     {
         return [
-            'view'  => $this->root() . '.editable',
+            'view' => $this->root().'.editable',
             'input' => 'input input-sm',
         ];
     }
 
-  public function toggleable(): array
-{
-    return [
-        'view'  => $this->root() . '.toggleable',
-    ];
-}
-
+    public function toggleable(): array
+    {
+        return [
+            'view' => $this->root().'.toggleable',
+        ];
+    }
 
     public function checkbox(): array
     {
         return [
-            'th'    => 'px-6 py-3 text-left text-xs font-medium tracking-wider',
-            'base'  => '',
+            'th' => 'px-6 py-3 text-left text-xs font-medium tracking-wider',
+            'base' => '',
             'label' => 'flex items-center space-x-3',
             'input' => 'checkbox checkbox-sm',
         ];
@@ -96,8 +96,8 @@ class MaryUI extends Theme
     public function radio(): array
     {
         return [
-            'th'    => 'px-6 py-3 text-left text-xs font-medium tracking-wider',
-            'base'  => '',
+            'th' => 'px-6 py-3 text-left text-xs font-medium tracking-wider',
+            'base' => '',
             'label' => 'flex items-center space-x-3 ',
             'input' => 'radio ',
         ];
@@ -106,8 +106,8 @@ class MaryUI extends Theme
     public function filterBoolean(): array
     {
         return [
-            'view'   => $this->root() . '.filters.boolean',
-            'base'   => 'min-w-[5rem]',
+            'view' => $this->root().'.filters.boolean',
+            'base' => 'min-w-[5rem]',
             'select' => 'select',
         ];
     }
@@ -115,8 +115,8 @@ class MaryUI extends Theme
     public function filterDatePicker(): array
     {
         return [
-            'base'  => '',
-            'view'  => $this->root() . '.filters.date-picker',
+            'base' => '',
+            'view' => $this->root().'.filters.date-picker',
             'input' => 'flatpickr flatpickr-input input',
         ];
     }
@@ -124,8 +124,8 @@ class MaryUI extends Theme
     public function filterMultiSelect(): array
     {
         return [
-            'view'   => $this->root() . '.filters.multi-select',
-            'base'   => 'inline-block relative w-full',
+            'view' => $this->root().'.filters.multi-select',
+            'base' => 'inline-block relative w-full',
             'select' => 'mt-1',
         ];
     }
@@ -133,7 +133,7 @@ class MaryUI extends Theme
     public function filterNumber(): array
     {
         return [
-            'view'  => $this->root() . '.filters.number',
+            'view' => $this->root().'.filters.number',
             'input' => 'w-full min-w-[5rem] block input',
         ];
     }
@@ -141,8 +141,8 @@ class MaryUI extends Theme
     public function filterSelect(): array
     {
         return [
-            'view'   => $this->root() . '.filters.select',
-            'base'   => '',
+            'view' => $this->root().'.filters.select',
+            'base' => '',
             'select' => 'select',
         ];
     }
@@ -150,18 +150,18 @@ class MaryUI extends Theme
     public function filterInputText(): array
     {
         return [
-            'view'   => $this->root() . '.filters.input-text',
-            'base'   => 'min-w-[9.5rem]',
+            'view' => $this->root().'.filters.input-text',
+            'base' => 'min-w-[9.5rem]',
             'select' => 'select',
-            'input'  => 'input',
+            'input' => 'input',
         ];
     }
 
     public function searchBox(): array
     {
         return [
-            'input'      => 'grow',
-            'iconClose'  => 'text-base-content',
+            'input' => 'grow',
+            'iconClose' => 'text-base-content',
             'iconSearch' => 'text-base-content grow mr-2 w-5 h-5',
         ];
     }

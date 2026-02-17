@@ -4,23 +4,26 @@ namespace App\Livewire\Category;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Mary\Traits\Toast;
-use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\PowerGridFields;
 
 final class CategoryTable extends PowerGridComponent
 {
     use Toast;
+
     public string $tableName = 'category-table';
+
     public array $name;
+
     public array $status;
+
     public bool $showErrorBag = true;
+
     public function setUp(): array
     {
 
@@ -79,12 +82,13 @@ final class CategoryTable extends PowerGridComponent
             'status.*' => ['required', 'boolean'],
         ];
     }
+
     public function onUpdatedEditable(int|string $id, string $field, string $value): void
-    {   
+    {
         try {
             $this->withValidator(function (Validator $validator) use ($id, $field) {
                 if ($validator->errors()->isNotEmpty()) {
-                    $this->dispatch('toggle-' . $field . '-' . $id);
+                    $this->dispatch('toggle-'.$field.'-'.$id);
                     $this->addError($field, $validator->errors()->first($field));
 
                 }
@@ -96,12 +100,14 @@ final class CategoryTable extends PowerGridComponent
         }
 
     }
+
     public function onUpdatedToggleable(string $id, string $field, string $value): void
     {
         Category::query()->find($id)->update([$field => $value]);
         $this->skipRender();
 
     }
+
     public function filters(): array
     {
         return [

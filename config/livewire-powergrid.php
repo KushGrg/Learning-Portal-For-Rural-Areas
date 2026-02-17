@@ -13,11 +13,10 @@ return [
     | Configure here the theme of your choice.
     */
 
-    //'theme' => \PowerComponents\LivewirePowerGrid\Themes\Tailwind::class,
+    // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\Tailwind::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\DaisyUI::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class,
-     'theme' => \App\Livewire\Themes\MaryUI::class,
-
+    'theme' => \App\Livewire\Themes\MaryUI::class,
 
     'cache_ttl' => null,
 
@@ -51,10 +50,10 @@ return [
         'flatpickr' => [
             'locales' => [
                 'pt_BR' => [
-                    'locale'     => 'pt',
+                    'locale' => 'pt',
                     'dateFormat' => 'd/m/Y H:i',
                     'enableTime' => true,
-                    'time_24hr'  => true,
+                    'time_24hr' => true,
                 ],
             ],
         ],
@@ -114,9 +113,9 @@ return [
 
     'filter_attributes' => [
         'input_text' => \PowerComponents\LivewirePowerGrid\FilterAttributes\InputText::class,
-        'boolean'    => \PowerComponents\LivewirePowerGrid\FilterAttributes\Boolean::class,
-        'number'     => \PowerComponents\LivewirePowerGrid\FilterAttributes\Number::class,
-        'select'     => \PowerComponents\LivewirePowerGrid\FilterAttributes\Select::class,
+        'boolean' => \PowerComponents\LivewirePowerGrid\FilterAttributes\Boolean::class,
+        'number' => \PowerComponents\LivewirePowerGrid\FilterAttributes\Number::class,
+        'select' => \PowerComponents\LivewirePowerGrid\FilterAttributes\Select::class,
     ],
 
     /*
@@ -142,10 +141,10 @@ return [
     */
 
     'exportable' => [
-        'default'      => 'openspout_v4',
+        'default' => 'openspout_v4',
         'openspout_v4' => [
             'xlsx' => \PowerComponents\LivewirePowerGrid\Components\Exports\OpenSpout\v4\ExportToXLS::class,
-            'csv'  => \PowerComponents\LivewirePowerGrid\Components\Exports\OpenSpout\v4\ExportToCsv::class,
+            'csv' => \PowerComponents\LivewirePowerGrid\Components\Exports\OpenSpout\v4\ExportToCsv::class,
         ],
     ],
 

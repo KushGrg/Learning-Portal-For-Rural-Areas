@@ -1,11 +1,10 @@
 <?php
 
-use App\Livewire\Category\Index as CategoryIndex;
 use App\Livewire\Category\CreateOrEdit as CategoryCreate;
-
+use App\Livewire\Category\Index as CategoryIndex;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-use Illuminate\Support\Facades\Auth;
 
 // Landing page - accessible to all
 // Volt::route('/', 'auth.login')->name('login');
@@ -34,15 +33,15 @@ Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Http\Request $requ
     $user->previously_verified = true;
     $user->save();
 
-    if (!Auth::check()) {
+    if (! Auth::check()) {
         $message = $user->previously_verified
             ? 'Welcome back! Your new email address has been verified.'
             : 'Email verification completed successfully!';
         Auth::login($user);
     } else {
         $message = $user->previously_verified
-            ? 'New Email address has been verified for ' . $user->name . '.'
-            : 'Email verification completed successfully for ' . $user->name . '.';
+            ? 'New Email address has been verified for '.$user->name.'.'
+            : 'Email verification completed successfully for '.$user->name.'.';
     }
 
     $user->sendEmailVerificationNotification();
@@ -77,5 +76,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Volt::route('/permissions', 'superadmin.permissions.index')->name('permissions.index');
     });
 });
-
-

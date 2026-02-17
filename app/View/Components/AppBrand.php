@@ -11,6 +11,7 @@ class AppBrand extends Component
     public array $images = [
 
     ];
+
     /**
      * Create a new component instance.
      */
@@ -44,6 +45,3 @@ class AppBrand extends Component
     HTML;
     }
 }
-
-
-
