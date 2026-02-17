@@ -1,0 +1,123 @@
+name: Pint and Phpstan
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  phpstan:
+    name: Static Analysis
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: json, dom, curl, libxml, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Generate key
+        run: php artisan key:generate
+
+      # ✅ Proper PHPStan cache (fixed)
+      - name: Restore PHPStan cache
+        uses: actions/cache@v3
+        with:
+          path: tmp
+          key: phpstan-result-cache-${{ github.ref }}
+          restore-keys: |
+            phpstan-result-cache-
+
+      - name: Run PHPStan
+        run: php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon
+
+      - name: Save PHPStan cache
+        uses: actions/cache@v3
+        if: ${{ !cancelled() }}
+        with:
+          path: tmp
+          key: phpstan-result-cache-${{ github.ref }}
+
+  pint:
+    name: Code Style
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: json, dom, curl, libxml, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8
+
+      - name: Run Pint
+        run: php -d memory_limit=-1 vendor/bin/pint
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "CHANGED=false" >> $GITHUB_ENV
+          else
+            echo "CHANGED=true" >> $GITHUB_ENV
+          fi
+
+      - name: Commit changes if needed
+        if: env.CHANGED == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Apply code style fixes (Laravel Pint)"
+          commit_user_name: "GitHub Action"
+          commit_user_email: "action@github.com"
