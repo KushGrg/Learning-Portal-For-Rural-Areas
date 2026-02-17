@@ -9,9 +9,13 @@ use Illuminate\View\Component;
 class CardLink extends Component
 {
     public string $title;
+
     public ?string $link;
+
     public ?string $icon;
+
     public ?string $text;
+
     public ?string $permission;
 
     /**
@@ -19,10 +23,10 @@ class CardLink extends Component
      */
     public function __construct(
         string $title,
-        string $link = null,
-        string $icon = null,
-        string $text = null,
-        string $permission = null
+        ?string $link = null,
+        ?string $icon = null,
+        ?string $text = null,
+        ?string $permission = null
     ) {
         $this->title = $title;
         $this->link = $link;

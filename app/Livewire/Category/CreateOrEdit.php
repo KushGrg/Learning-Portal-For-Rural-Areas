@@ -3,9 +3,8 @@
 namespace App\Livewire\Category;
 
 use App\Enums\Status;
-use App\Livewire\Category\CategoryForm;
-use Livewire\Component;
 use App\Traits\HasStatus;
+use Livewire\Component;
 use Mary\Traits\Toast;
 
 class CreateOrEdit extends Component
@@ -13,7 +12,9 @@ class CreateOrEdit extends Component
     use HasStatus, Toast;
 
     public CategoryForm $form;
+
     public array $statusOptions = [];
+
     public function mount()
     {
         $this->statusOptions = $this->status(Status::class, 'value', 'name');
@@ -28,9 +29,10 @@ class CreateOrEdit extends Component
             $this->success('Category created sucessfully.');
         } catch (\Exception $e) {
             $this->error('Failed to create category.');
-                \Log::info('Failed to create category'. $e->getMessage());
+            \Log::info('Failed to create category'.$e->getMessage());
         }
     }
+
     public function render()
     {
         return view('livewire.category.create-or-edit');

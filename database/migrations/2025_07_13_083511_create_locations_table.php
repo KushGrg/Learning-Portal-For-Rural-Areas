@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->unique(); // UUID 
+            $table->uuid('uuid')->unique(); // UUID
             $table->string('name', 100);
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('restrict');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('restrict');
-       
+
         });
     }
 

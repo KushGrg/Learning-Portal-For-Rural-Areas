@@ -38,8 +38,8 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8
+      - name: Install Dependencies (with dev)
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8 --dev
         env:
           COMPOSER_PROCESS_TIMEOUT: 0
           COMPOSER_NO_INTERACTION: 1
@@ -51,7 +51,6 @@ jobs:
       - name: Generate key
         run: php artisan key:generate
 
-      # ✅ Proper PHPStan cache (fixed)
       - name: Restore PHPStan cache
         uses: actions/cache@v3
         with:
@@ -99,23 +98,22 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8
+      - name: Install Dependencies (with dev)
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8 --dev
 
       - name: Run Pint
         run: php -d memory_limit=-1 vendor/bin/pint
 
       - name: Check for changes
-        id: changes
+        id: check_changes
         run: |
           if git diff --quiet; then
-            echo "CHANGED=false" >> $GITHUB_ENV
+            echo "changed=false" >> $GITHUB_ENV
           else
-            echo "CHANGED=true" >> $GITHUB_ENV
-          fi
+            echo "changed=true" >> $GITHUB_ENV
 
       - name: Commit changes if needed
-        if: env.CHANGED == 'true'
+        if: ${{ env.changed == 'true' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Apply code style fixes (Laravel Pint)"

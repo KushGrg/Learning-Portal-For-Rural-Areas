@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\HasUuid;
-
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -20,6 +19,4 @@ class Category extends Model
         'created_by',
         'updated_by',
     ];
-
-   
 }

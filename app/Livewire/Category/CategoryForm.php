@@ -8,13 +8,14 @@ use Livewire\Form;
 
 class CategoryForm extends Form
 {
-     #[Validate('required|unique:categories,name', message: [
+    #[Validate('required|unique:categories,name', message: [
         'unique' => 'This name already exists.',
     ])]
     public $name;
 
-    #[Validate('required' )]
+    #[Validate('required')]
     public $status;
+
     public function create()
     {
         Category::create([

@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
@@ -21,27 +21,27 @@ class RolesAndPermissionsSeeder extends Seeder
             'create_users',
             'edit_users',
             'delete_users',
-            
+
             // Role permissions
             'view_roles',
             'create_roles',
             'edit_roles',
             'delete_roles',
-            
+
             // Permission permissions
             'view_permissions',
             'create_permissions',
             'edit_permissions',
             'delete_permissions',
-            
+
             // Dashboard permission
             'access_dashboard',
 
-            //Category permission
+            // Category permission
             'access_category',
             'create_category',
             'edit_category',
-            'delete_category'
+            'delete_category',
         ];
 
         foreach ($permissions as $permission) {
@@ -58,5 +58,4 @@ class RolesAndPermissionsSeeder extends Seeder
         $superadminRole = Role::create(['name' => 'superadmin']);
         $superadminRole->givePermissionTo(Permission::all());
     }
-} 
-
+}
