@@ -1,4 +1,4 @@
-name: Pint and Phpstan
+name: Pint and PHPStan
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.4"
           extensions: json, dom, curl, libxml, mbstring, zip
           coverage: none
           tools: composer:v2
@@ -38,8 +38,8 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install Dependencies (with dev)
-        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8 --dev
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8
         env:
           COMPOSER_PROCESS_TIMEOUT: 0
           COMPOSER_NO_INTERACTION: 1
@@ -48,7 +48,7 @@ jobs:
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-      - name: Generate key
+      - name: Generate app key
         run: php artisan key:generate
 
       - name: Restore PHPStan cache
@@ -82,7 +82,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.4"
           extensions: json, dom, curl, libxml, mbstring, zip
           coverage: none
           tools: composer:v2
@@ -98,22 +98,23 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install Dependencies (with dev)
-        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8 --dev
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --ignore-platform-req=ext-oci8
 
-      - name: Run Pint
-        run: php -d memory_limit=-1 vendor/bin/pint
+      - name: Run Pint in check mode
+        run: php -d memory_limit=-1 vendor/bin/pint --test
 
-      - name: Check for changes
+      - name: Check for code changes
         id: check_changes
         run: |
           if git diff --quiet; then
-            echo "changed=false" >> $GITHUB_ENV
+            echo "changed=false" >> $GITHUB_OUTPUT
           else
-            echo "changed=true" >> $GITHUB_ENV
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Commit changes if needed
-        if: ${{ env.changed == 'true' }}
+      - name: Commit code style fixes (optional)
+        if: steps.check_changes.outputs.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Apply code style fixes (Laravel Pint)"
