@@ -54,7 +54,11 @@ jobs:
           restore-keys: phpstan-cache-${{ github.head_ref }}-
 
       - name: Run PHPStan
-        run: php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon --cache=tmp
+        run: php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
 
       - name: Save PHPStan cache
         uses: actions/cache@v3
@@ -92,17 +96,22 @@ jobs:
           COMPOSER_NO_INTERACTION: 1
           COMPOSER_NO_AUDIT: 1
 
-      - name: Check for changes
+      - name: Check for changed PHP files
         id: check_changes
         run: |
-          # Default values
+          git fetch origin main
           CODE_STYLE_CHANGED=false
           COMPOSER_LOCK_CHANGED=false
 
-          # Check for changes
-          git fetch origin main
-          git diff --name-only origin/main...HEAD | grep -q '.php$' && CODE_STYLE_CHANGED=true
-          git diff --name-only origin/main...HEAD | grep -q 'composer.lock' && COMPOSER_LOCK_CHANGED=true
+          # Detect changed PHP files
+          if git diff --name-only origin/main...HEAD | grep -q '\.php$'; then
+            CODE_STYLE_CHANGED=true
+          fi
+
+          # Detect composer.lock changes
+          if git diff --name-only origin/main...HEAD | grep -q 'composer.lock'; then
+            COMPOSER_LOCK_CHANGED=true
+          fi
 
           # Set commit message
           if [[ "$CODE_STYLE_CHANGED" == "true" && "$COMPOSER_LOCK_CHANGED" == "true" ]]; then
@@ -119,12 +128,12 @@ jobs:
           echo "composer_lock_changed=$COMPOSER_LOCK_CHANGED" >> $GITHUB_OUTPUT
           echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
 
-      - name: Run Pint only on changed files
+      - name: Run Pint on changed PHP files only
         run: |
           git fetch origin main
           git diff --name-only origin/main...HEAD | grep '\.php$' | xargs -r vendor/bin/pint
 
-      - name: Commit changes
+      - name: Commit Pint changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: ${{ steps.check_changes.outputs.commit_message }}
