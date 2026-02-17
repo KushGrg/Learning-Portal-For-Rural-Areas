@@ -40,6 +40,7 @@
                 {{-- Profile page (always accessible) --}}
                 <x-menu-item title="Category" icon="o-tag" link="/category" />
                 <x-menu-item title="Profile" icon="o-user" link="/profile" />
+                <x-menu-item title="Setting" icon="o-user" link="/setting" />
             @endif
 
             <x-menu-separator />
