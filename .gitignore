@@ -8,6 +8,7 @@
 /vendor
 .env
 .env.backup
+.env.docker
 .env.production
 .phpactor.json
 .phpunit.result.cache
@@ -22,3 +23,5 @@ yarn-error.log
 /.vscode
 /.zed
 .vercel
+/tmp
+.mimocode/
