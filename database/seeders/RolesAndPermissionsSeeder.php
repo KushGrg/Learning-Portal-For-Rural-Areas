@@ -11,52 +11,79 @@ class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create permissions
         $permissions = [
-            // User permissions
+            'access_dashboard',
+
+            // User management
             'view_users',
             'create_users',
             'edit_users',
             'delete_users',
-            
-            // Role permissions
+
+            // Role management
             'view_roles',
             'create_roles',
             'edit_roles',
             'delete_roles',
-            
-            // Permission permissions
-            'view_permissions',
-            'create_permissions',
-            'edit_permissions',
-            'delete_permissions',
-            
-            // Dashboard permission
-            'access_dashboard',
 
-            //Category permission
-            'access_category',
-            'create_category',
-            'edit_category',
-            'delete_category'
+            // Subject management
+            'view_subjects',
+            'create_subjects',
+            'edit_subjects',
+            'delete_subjects',
+
+            // Course management
+            'view_courses',
+            'create_courses',
+            'edit_courses',
+            'delete_courses',
+            'publish_courses',
+
+            // Resource management
+            'view_resources',
+            'create_resources',
+            'edit_resources',
+            'delete_resources',
+            'upload_resources',
+
+            // Student actions
+            'enroll_courses',
+            'bookmark_resources',
+            'download_resources',
         ];
 
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
         }
 
-        // Create admin role and assign permissions
+        // Admin role
         $adminRole = Role::create(['name' => 'admin']);
         $adminRole->givePermissionTo([
             'access_dashboard',
+            'view_users', 'create_users', 'edit_users', 'delete_users',
+            'view_roles', 'create_roles', 'edit_roles', 'delete_roles',
+            'view_subjects', 'create_subjects', 'edit_subjects', 'delete_subjects',
+            'view_courses', 'create_courses', 'edit_courses', 'delete_courses', 'publish_courses',
+            'view_resources', 'create_resources', 'edit_resources', 'delete_resources', 'upload_resources',
         ]);
 
-        // Create superadmin role and assign permissions
-        $superadminRole = Role::create(['name' => 'superadmin']);
-        $superadminRole->givePermissionTo(Permission::all());
-    }
-} 
+        // Teacher role
+        $teacherRole = Role::create(['name' => 'teacher']);
+        $teacherRole->givePermissionTo([
+            'access_dashboard',
+            'view_courses', 'create_courses', 'edit_courses',
+            'view_resources', 'create_resources', 'edit_resources', 'delete_resources', 'upload_resources',
+            'view_subjects',
+        ]);
 
+        // Student role
+        $studentRole = Role::create(['name' => 'student']);
+        $studentRole->givePermissionTo([
+            'access_dashboard',
+            'view_courses', 'view_resources',
+            'enroll_courses', 'bookmark_resources', 'download_resources',
+        ]);
+    }
+}

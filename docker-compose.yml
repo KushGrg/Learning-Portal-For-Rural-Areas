@@ -1,0 +1,75 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: learning-portal-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8000
+      - PHP_CLI_SERVER_WORKERS=4
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=learning_portal
+      - DB_USERNAME=kush
+      - DB_PASSWORD=kush
+    networks:
+      - learning-portal
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0
+    container_name: learning-portal-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: learning_portal
+      MYSQL_USER: kush
+      MYSQL_PASSWORD: kush
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - learning-portal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  node:
+    image: node:20
+    container_name: learning-portal-node
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - node-modules:/var/www/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - learning-portal
+    command: >
+      sh -c "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then yarn install; fi && env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin HOME=/root node node_modules/.bin/vite --host 0.0.0.0"
+
+volumes:
+  mysql-data:
+    driver: local
+  node-modules:
+    driver: local
+
+networks:
+  learning-portal:
+    driver: bridge

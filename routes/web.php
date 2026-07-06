@@ -1,17 +1,11 @@
 <?php
 
-use App\Livewire\Category\Index as CategoryIndex;
-use App\Livewire\Category\CreateOrEdit as CategoryCreate;
-
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Auth;
 
-// Landing page - accessible to all
-// Volt::route('/', 'auth.login')->name('login');
 Volt::route('/', 'landing')->name('landing');
 
-// Authentication routes
 Route::middleware('guest')->group(function () {
     Volt::route('/login', 'auth.login')->name('login');
     Volt::route('/register', 'auth.register')->name('register');
@@ -22,10 +16,6 @@ Route::middleware('guest')->group(function () {
 Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Http\Request $request, $id, $hash) {
     $user = \App\Models\User::findOrFail($id);
 
-    // if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-    //     throw new AuthorizationException;
-    // }
-
     if ($user->hasVerifiedEmail()) {
         return redirect('/');
     }
@@ -35,47 +25,62 @@ Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Http\Request $requ
     $user->save();
 
     if (!Auth::check()) {
-        $message = $user->previously_verified
-            ? 'Welcome back! Your new email address has been verified.'
-            : 'Email verification completed successfully!';
         Auth::login($user);
-    } else {
-        $message = $user->previously_verified
-            ? 'New Email address has been verified for ' . $user->name . '.'
-            : 'Email verification completed successfully for ' . $user->name . '.';
     }
 
     $user->sendEmailVerificationNotification();
-
-    return redirect('/')->with('verified', $message);
+    return redirect('/')->with('verified', 'Email verified successfully!');
 })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
-// Email verification routes
 Route::middleware('auth')->group(function () {
     Volt::route('/email/verify', 'auth.verify-email')->name('verification.notice');
 });
 
-// Routes that require authentication but not email verification
-Route::middleware('auth')->group(function () {
-    Volt::route('/profile', 'profile')->name('profile');
+Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('/dashboard', 'dashboard')->name('dashboard')->middleware('permission:access_dashboard');
+    Volt::route('/profile', 'profile')->name('profile');
     Volt::route('/logout', 'auth.logout')->name('logout');
 
-    Route::prefix('category')->name('category.')->group(function () {
-        Route::get('/', CategoryIndex::class)->name('index')->middleware('permission:access_category');
-        Route::get('/create', CategoryCreate::class)->name('create')->middleware('permission:create_category');
-    });
-});
-
-// Protected routes requiring email verification
-Route::middleware(['auth', 'verified'])->group(function () {
-
     // Admin routes
-    Route::middleware('role:superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
-        Volt::route('/users', 'superadmin.users.index')->name('users.index');
-        Volt::route('/roles', 'superadmin.roles.index')->name('roles.index');
-        Volt::route('/permissions', 'superadmin.permissions.index')->name('permissions.index');
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Volt::route('/users', 'admin.users.index')->name('users.index');
+        Volt::route('/users/create', 'admin.users.create-or-edit')->name('users.create');
+        Volt::route('/users/{id}/edit', 'admin.users.create-or-edit')->name('users.edit');
+
+        Volt::route('/subjects', 'admin.subjects.index')->name('subjects.index');
+        Volt::route('/subjects/create', 'admin.subjects.create-or-edit')->name('subjects.create');
+        Volt::route('/subjects/{id}/edit', 'admin.subjects.create-or-edit')->name('subjects.edit');
+
+        Volt::route('/courses', 'admin.courses.index')->name('courses.index');
+        Volt::route('/courses/create', 'admin.courses.create-or-edit')->name('courses.create');
+        Volt::route('/courses/{id}/edit', 'admin.courses.create-or-edit')->name('courses.edit');
+    });
+
+    // Teacher routes (admin can also manage resources)
+    Route::middleware('role:admin|teacher')->prefix('teacher')->name('teacher.')->group(function () {
+        Volt::route('/resources', 'teacher.resources.index')->name('resources.index');
+        Volt::route('/resources/create', 'teacher.resources.create-or-edit')->name('resources.create');
+        Volt::route('/resources/{id}/edit', 'teacher.resources.create-or-edit')->name('resources.edit');
+    });
+
+    // Student routes
+    Route::middleware('role:student')->prefix('student')->name('student.')->group(function () {
+        Volt::route('/library', 'student.library.index')->name('library.index');
+        Volt::route('/courses', 'student.courses.index')->name('courses.index');
+        Volt::route('/bookmarks', 'student.bookmarks.index')->name('bookmarks.index');
+
+        Route::get('/resources/{resource}/download', function (\App\Models\Resource $resource) {
+            $resource->incrementDownloads();
+            $file = $resource->primaryFile;
+
+            if (!$file || !$file->path) {
+                abort(404);
+            }
+
+            return response()->download(
+                storage_path('app/public/' . $file->path),
+                $file->original_name
+            );
+        })->name('resources.download');
     });
 });
-
-

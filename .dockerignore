@@ -1,0 +1,17 @@
+node_modules
+vendor
+.git
+.mimocode
+.github
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+public/storage
+.env
+.env.example
+.vercelignore
+docs
+tests
+tmp
